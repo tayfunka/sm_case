@@ -1,0 +1,2 @@
+search:
+https://thedyrt.com/api/v6/campground-search-results?filter%5Bsearch%5D%5Bbooking-method%5D=ridb&filter%5Bsearch%5D%5Brecommended%5D=1&filter%5Bsearch%5D%5Borigin%5D=32.8%2C39.9&page%5Bnumber%5D=1&page%5Bsize%5D=10

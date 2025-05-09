@@ -1,6 +1,10 @@
 from fastapi import APIRouter
-from api.campground import auth, book, categories, user
+from src.api import campground
 
 router = APIRouter()
 
-router.include_router(book.router, prefix='/campground', tags=['campground'])
+router.include_router(
+    campground.router,
+    prefix="/campground",
+    tags=["campground"],
+)
