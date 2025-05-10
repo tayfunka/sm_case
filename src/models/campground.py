@@ -1,9 +1,10 @@
 from sqlalchemy import Column, String, Float, Boolean, Integer, DateTime
 from sqlalchemy.dialects.postgresql import ARRAY
 from src.core.db import Base
+from sqlalchemy.inspection import inspect
 
 
-class Campground(Base):
+class DBCampground(Base):
     __tablename__ = "campgrounds"
 
     id = Column(String, primary_key=True, index=True)
@@ -27,3 +28,12 @@ class Campground(Base):
     price_low = Column(Float, nullable=True)
     price_high = Column(Float, nullable=True)
     availability_updated_at = Column(DateTime, nullable=True)
+
+    def get_required_fields(self):
+        '''Get required fields from DBCampground model.'''
+        mapper = inspect(self.__class__)
+        return [
+            column.key
+            for column in mapper.columns
+            if not column.nullable or column.default is None
+        ]

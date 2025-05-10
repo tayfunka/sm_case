@@ -17,7 +17,7 @@ For questions please connect us via email at info@smart-maple.com
 ## Bonus
 - Database: Use an ORM for PostgreSQL operations
 - Logging: Comprehensive logging system
-- API Endpoint: Flask/FastAPI endpoint to trigger/control scraper 
+- API Endpoint: Flask/FastAPI endpoint to trigger/control scraper
   (Hint: you can implement this in an async fashion)
 - Performance: Multithreading/async implementation
 - Find address from lat/long field

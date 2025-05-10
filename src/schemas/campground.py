@@ -12,7 +12,6 @@ class CampgroundLinks(BaseModel):
 class Campground(BaseModel):
     id: str
     type: str
-    links: CampgroundLinks
     name: str
     latitude: float
     longitude: float
@@ -39,12 +38,18 @@ class Campground(BaseModel):
     # address: Optinal[str] = "" For bonus point
 
 
-class CampgroundRequest(BaseModel):
+class CampgroundRequest(Campground):
     id: str
 
 
-class CampgroundResponse(Campground):
-    id: str
+class PaginationParams(BaseModel):
+    limit: int = Field(10, ge=1, le=100)
+    offset: int = Field(0, ge=0)
 
     class Config:
-        orm_mode = True
+        schema_extra = {
+            "example": {
+                "limit": 10,
+                "offset": 0
+            }
+        }
