@@ -125,9 +125,11 @@ The `/fetch_campgrounds` endpoint in [`src/api/dyrt.py`](src/api/dyrt.py) uses t
 
 2. Create a .env file in the root directory with the following variables:
    ```env
-   POSTGRES_USER=your_postgres_user
-   POSTGRES_PASSWORD=your_postgres_password
-   POSTGRES_DB=your_postgres_db
+    POSTGRES_USER=postgres
+    POSTGRES_PASSWORD=postgres
+    POSTGRES_DB=sm_case
+    POSTGRES_HOST=db
+    POSTGRES_PORT=5432
 
 3. Build and start the Docker containers:
    ```bash
