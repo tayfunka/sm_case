@@ -89,7 +89,7 @@ async def update_campground(
 
 
 @router.get('/{campground_id}/address')
-async def find_adress(campground_id: str, db: Session = Depends(get_db)):
+async def find_address(campground_id: str, db: Session = Depends(get_db)):
     '''Get adress of a campground by ID'''
     db_campground = get_campground(db, campground_id)
     if not db_campground:

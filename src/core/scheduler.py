@@ -35,6 +35,6 @@ def scheduled_fetch_campgrounds():
 def start_scheduler():
     scheduler = BackgroundScheduler()
     scheduler.add_job(func=scheduled_fetch_campgrounds,
-                      trigger='cron', second='*/20')
+                      trigger='cron', hour='*/1')
     scheduler.start()
     logger.info("Press Control+C to exit")
