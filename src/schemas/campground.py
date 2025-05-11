@@ -1,55 +1,43 @@
-from datetime import datetime
-from typing import List, Optional
-
-from pydantic import BaseModel, Field, HttpUrl
-
-
-class CampgroundLinks(BaseModel):
-
-    self: HttpUrl
+from pydantic import BaseModel, Field
+from pydantic import BaseModel
+from typing import List, Literal
 
 
-class Campground(BaseModel):
-    id: str
-    type: str
-    name: str
-    latitude: float
-    longitude: float
-    region_name: str = Field(..., alias="region-name")
-    administrative_area: Optional[str] = Field(
-        None, alias="administrative-area")
-    nearest_city_name: Optional[str] = Field(None, alias="nearest-city-name")
-    accommodation_type_names: List[str] = Field(
-        [], alias="accommodation-type-names")
-    bookable: bool = False
-    camper_types: List[str] = Field([], alias="camper-types")
-    operator: Optional[str] = None
-    photo_url: Optional[HttpUrl] = Field(None, alias="photo-url")
-    photo_urls: List[HttpUrl] = Field([], alias="photo-urls")
-    photos_count: int = Field(0, alias="photos-count")
-    rating: Optional[float] = None
-    reviews_count: int = Field(0, alias="reviews-count")
-    slug: Optional[str] = None
-    price_low: Optional[float] = Field(None, alias="price-low")
-    price_high: Optional[float] = Field(None, alias="price-high")
-    availability_updated_at: Optional[datetime] = Field(
-        None, alias="availability-updated-at"
-    )
-    # address: Optinal[str] = "" For bonus point
+class FetchCampgroundsRequest(BaseModel):
+    component: Literal['US', 'TR']
+    sort: Literal['Recommended', 'Name']
+    page_number: int = Field(
+        1, ge=1, le=5, description="Page number must be between 1 and 5")
+    page_size: int = Field(
+        1, ge=1, le=500, description="Page size must be between 1 and 500")
+    insert_db: bool = False
+
+    def to_params(self) -> dict:
+        '''Convert the request object to a dictionary of parameters'''
+        bbox = '-101.792,18.75,-90.93,52.334' if self.component == 'US' else '-101.792,18.75,-90.93,52.334'
+        sort_ = 'recommended' if self.sort == 'Recommended' else 'name-raw'
+        return {
+            "filter[search][bbox]": bbox,
+            "sort": sort_,
+            "page[number]": self.page_number,
+            "page[size]": self.page_size
+        }
 
 
-class CampgroundRequest(Campground):
-    id: str
+class FetchCampgroundsResponse(BaseModel):
+    data: List[dict]
+    meta: dict
+    links: dict
 
 
 class PaginationParams(BaseModel):
-    limit: int = Field(10, ge=1, le=100)
-    offset: int = Field(0, ge=0)
+    page_size: int = Field(10, ge=1, le=100)
+    page_number: int = Field(0, ge=0)
 
     class Config:
         schema_extra = {
             "example": {
-                "limit": 10,
-                "offset": 0
+                "page_size": 10,
+                "page_number": 0
             }
         }

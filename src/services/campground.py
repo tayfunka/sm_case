@@ -1,38 +1,51 @@
 from sqlalchemy.orm import Session
-from src.models.campground import DBCampground
-from src.schemas.campground import CampgroundRequest, Campground, PaginationParams
+from src.models.campground import DBCampground, Campground
+from src.schemas.campground import PaginationParams
 from fastapi import Depends
+from src.core.logging import logger
 
 
-def create_campground(db: Session, campground: Campground):
-    db_campground = DBCampground(
-        id=campground.id,
-        type=campground.type,
-        name=campground.name,
-        latitude=campground.latitude,
-        longitude=campground.longitude,
-        region_name=campground.region_name,
-        administrative_area=campground.administrative_area,
-        nearest_city_name=campground.nearest_city_name,
-        accommodation_type_names=campground.accommodation_type_names,
-        bookable=campground.bookable,
-        camper_types=campground.camper_types,
-        operator=campground.operator,
-        photo_url=campground.photo_url,
-        photo_urls=campground.photo_urls,
-        photos_count=campground.photos_count,
-        rating=campground.rating,
-        reviews_count=campground.reviews_count,
-        slug=campground.slug,
-        price_low=campground.price_low,
-        price_high=campground.price_high,
-        availability_updated_at=campground.availability_updated_at,
-    )
+async def parse_campgrounds_from_response(response) -> list[Campground]:
+    try:
+        campgrounds_data = response.json().get("data", [])
+        if not campgrounds_data:
+            raise ValueError("No 'data' found in response")
 
-    db.add(db_campground)
-    db.commit()
-    db.refresh(db_campground)
-    return db_campground
+        campgrounds = []
+        for item in campgrounds_data:
+            attributes = item.get("attributes", {})
+            attributes.update({
+                "id": item.get("id"),
+                "type": item.get("type", "campground"),
+                "links": item.get("links", {})
+            })
+            campground = Campground(**attributes)
+            campgrounds.append(campground)
+
+        logger.info(f"{len(campgrounds)} campgrounds parsed")
+        return campgrounds
+
+    except Exception as e:
+        logger.error(f"Failed to parse campgrounds: {e}")
+        raise
+
+
+def create_campground(db: Session, campground: DBCampground):
+    try:
+        campground_in_db = get_campground(db, campground.id)
+
+        if campground_in_db:
+            logger.info(
+                f"Campground with id '{campground.id}' already exists in the database.")
+            return campground_in_db
+        else:
+            db.add(campground)
+            db.commit()
+            db.refresh(campground)
+            return campground
+    except Exception as e:
+        db.rollback()
+        raise e
 
 
 def get_campground(db: Session, campground_id: str):
